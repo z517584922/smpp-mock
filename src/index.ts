@@ -45,7 +45,7 @@ const server = createServer((socket) => {
   let isBound = false;
 
   // 记录会话状态变化
-  session.on('state', (state) => {
+  session.on('state', (state: string) => {
     logger.debug(`会话状态变化 [${sessionId}]: ${state}`);
   });
 
@@ -68,15 +68,17 @@ const server = createServer((socket) => {
         session.send(pdu.response());
         isBound = true;
         logger.info(`绑定成功 [${sessionId}]: system_id=${system_id}`);
-      } catch (error) {
-        logger.error(`发送绑定响应失败 [${sessionId}]: ${error.message}`);
+      } catch (error: unknown) {
+        const err = error as Error;
+        logger.error(`发送绑定响应失败 [${sessionId}]: ${err.message}`);
       }
     } else {
       logger.warn(`绑定失败 [${sessionId}]: 认证信息不匹配`);
       try {
         session.send(pdu.response({ command_status: 0x0d }));
-      } catch (error) {
-        logger.error(`发送绑定失败响应失败 [${sessionId}]: ${error.message}`);
+      } catch (error: unknown) {
+        const err = error as Error;
+        logger.error(`发送绑定失败响应失败 [${sessionId}]: ${err.message}`);
       }
     }
   });
@@ -98,8 +100,9 @@ const server = createServer((socket) => {
         message_id: Date.now().toString()
       }));
       logger.info(`短信提交成功 [${sessionId}]: from=${source_addr}, to=${destination_addr}`);
-    } catch (error) {
-      logger.error(`发送短信响应失败 [${sessionId}]: ${error.message}`);
+    } catch (error: unknown) {
+      const err = error as Error;
+      logger.error(`发送短信响应失败 [${sessionId}]: ${err.message}`);
     }
   });
 
@@ -118,8 +121,9 @@ const server = createServer((socket) => {
       
       session.send(response);
       logger.debug(`查询响应已发送 [${sessionId}]: sequence_number=${pdu.sequence_number}`);
-    } catch (error) {
-      logger.error(`发送查询响应失败 [${sessionId}]: ${error.message}`);
+    } catch (error: unknown) {
+      const err = error as Error;
+      logger.error(`发送查询响应失败 [${sessionId}]: ${err.message}`);
     }
   });
 
@@ -130,8 +134,9 @@ const server = createServer((socket) => {
       session.send(pdu.response());
       isBound = false;
       logger.info(`解绑成功 [${sessionId}]`);
-    } catch (error) {
-      logger.error(`发送解绑响应失败 [${sessionId}]: ${error.message}`);
+    } catch (error: unknown) {
+      const err = error as Error;
+      logger.error(`发送解绑响应失败 [${sessionId}]: ${err.message}`);
     }
   });
 
